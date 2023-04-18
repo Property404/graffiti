@@ -44,6 +44,7 @@ impl ModelController {
 
     pub async fn get_state(&self) -> Result<StateResponse> {
         let state = self.state.lock().expect("POISONED");
-        Ok(StateResponse(state.clone()))
+        let state = state.iter().map(|(a, b)| (*a, *b)).collect();
+        Ok(StateResponse(state))
     }
 }

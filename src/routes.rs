@@ -15,9 +15,9 @@ use tokio_stream::{wrappers::BroadcastStream, StreamExt};
 
 pub fn routes(mc: ModelController) -> Router {
     Router::new()
+        .route("/state", get(get_state))
         .route("/feed", get(sse_handler))
         .route("/update", post(update_state))
-        .route("/state", get(get_state))
         .with_state(mc)
 }
 
@@ -27,11 +27,13 @@ async fn update_state(State(mc): State<ModelController>, Json(update): Json<Upda
 }
 
 async fn get_state(State(mc): State<ModelController>) -> Result<Json<StateResponse>> {
-    let state = mc.get_state().await?;
-    Ok(Json(state))
+    let state = Json(mc.get_state().await?);
+    println!("State: {state:?}");
+    Ok(state)
 }
 
 async fn sse_handler(State(mc): State<ModelController>) -> Sse<impl Stream<Item = Result<Event>>> {
+    println!("Waa wee sse");
     let stream = BroadcastStream::new(mc.tx.subscribe())
         .map(|updates| Event::default().json_data(updates.unwrap()).unwrap())
         .map(Ok);

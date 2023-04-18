@@ -47,4 +47,4 @@ impl Update {
 
 /// The whole board.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
-pub struct StateResponse(pub HashMap<Point, Color>);
+pub struct StateResponse(pub Vec<(Point, Color)>);
