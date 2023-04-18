@@ -12,7 +12,7 @@ pub enum Error {
     TicketIdNotFound(u64),
 }
 
-pub type Result<T = ()> = std::result::Result<T, Error>;
+pub type Result<T = (), E = Error> = std::result::Result<T, E>;
 
 impl IntoResponse for Error {
     fn into_response(self) -> Response {

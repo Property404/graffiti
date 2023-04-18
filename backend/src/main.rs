@@ -3,16 +3,21 @@ mod errors;
 mod model;
 mod web;
 
-use axum::extract::{Path, Query};
-use axum::response::{Html, IntoResponse, Response};
-use axum::routing::{get, get_service};
-use axum::{middleware, Router};
+use axum::{
+    extract::{Path, Query},
+    middleware,
+    response::{Html, IntoResponse, Response, sse::{Sse, KeepAlive, Event}},
+    routing::{get, get_service},
+    Router,
+};
 use errors::{Error, Result};
 use model::ModelController;
 use serde::Deserialize;
-use std::net::SocketAddr;
+use std::{time::Duration, net::SocketAddr, convert::Infallible};
 use tower_cookies::CookieManagerLayer;
 use tower_http::services::ServeDir;
+use tokio_stream::StreamExt;
+use futures_util::stream::{self, Stream};
 
 const STYLE: &str = "<style>html{background-color:black;color:white}</style>";
 
@@ -21,6 +26,7 @@ async fn main() -> Result {
     let mc = ModelController::new().await?;
 
     let routes_merged = Router::new()
+        .route("/sse", get(sse_handler))
         .merge(routes_hello())
         .merge(web::routes_login::routes())
         .nest("/api", web::routes_tickets::routes(mc))
@@ -36,6 +42,15 @@ async fn main() -> Result {
         .unwrap();
 
     Ok(())
+}
+
+async fn sse_handler() -> Sse<impl Stream<Item = Result<Event, Infallible>>> {
+    // A `Stream` that repeats an event every second
+    let stream = stream::repeat_with(|| Event::default().data("hi!"))
+        .map(Ok)
+        .throttle(Duration::from_secs(1));
+
+    Sse::new(stream).keep_alive(KeepAlive::default())
 }
 
 async fn main_response_mapper(res: Response) -> Response {
