@@ -34,8 +34,8 @@ impl Update {
             Self::Point { point, color } => HashMap::from([(*point, *color)]),
             Self::Rect { start, end, color } => {
                 let mut map = HashMap::new();
-                for x in start.x..=end.x {
-                    for y in start.y..=end.y {
+                for x in start.x..end.x {
+                    for y in start.y..end.y {
                         map.insert(Point { x, y }, *color);
                     }
                 }
