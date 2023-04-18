@@ -1,4 +1,5 @@
-use crate::model::{ModelController, Ticket, TicketForCreate};
+use crate::api::{Color, Point, Update, Updates};
+use crate::model::ModelController;
 use crate::Result;
 use axum::{
     extract::{Path, State},
@@ -9,28 +10,16 @@ use serde_json::json;
 
 pub fn routes(mc: ModelController) -> Router {
     Router::new()
-        .route("/tickets", post(create_ticket).get(list_tickets))
-        .route("/tickets/:id", delete(delete_ticket))
+        .route("/update", post(update_state))
+        .route("/state", get(get_state))
         .with_state(mc)
 }
 
-async fn create_ticket(
-    State(mc): State<ModelController>,
-    Json(ticket_fc): Json<TicketForCreate>,
-) -> Result<Json<Ticket>> {
-    let ticket = mc.create_ticket(ticket_fc).await?;
-    Ok(Json(ticket))
+async fn update_state(State(mc): State<ModelController>, Json(updates): Json<Updates>) -> Result {
+    mc.update_state(updates).await
 }
 
-async fn list_tickets(State(mc): State<ModelController>) -> Result<Json<Vec<Ticket>>> {
-    let tickets = mc.list_tickets().await?;
-    Ok(Json(tickets))
-}
-
-async fn delete_ticket(
-    State(mc): State<ModelController>,
-    Path(id): Path<u64>,
-) -> Result<Json<Ticket>> {
-    let ticket = mc.delete_ticket(id).await?;
-    Ok(Json(ticket))
+async fn get_state(State(mc): State<ModelController>) -> Result<Json<Updates>> {
+    let state = mc.get_state().await?;
+    Ok(Json(state))
 }

@@ -1,55 +1,46 @@
-//! Simplistic model layer
-//! (with mock-store layer)
-
+use crate::api::{Color, Point, Update, Updates};
 use crate::errors::{Error, Result};
 use serde::{Deserialize, Serialize};
-use std::sync::{Arc, Mutex};
+use std::{
+    collections::HashMap,
+    sync::{Arc, Mutex},
+};
 
-#[derive(Clone, Debug, Serialize)]
-pub struct Ticket {
-    pub id: u64,
-    pub title: String,
-}
+const SIZE: usize = 256;
 
-#[derive(Clone, Debug, Deserialize)]
-pub struct TicketForCreate {
-    pub title: String,
-}
-
-#[derive(Clone)]
+#[derive(Clone, Default)]
 pub struct ModelController {
-    tickets_store: Arc<Mutex<Vec<Option<Ticket>>>>,
+    state: Arc<Mutex<HashMap<Point, Color>>>,
 }
 
 impl ModelController {
-    pub async fn new() -> Result<Self> {
-        Ok(Self {
-            tickets_store: Arc::default(),
-        })
+    pub async fn update_state(&self, Updates(updates): Updates) -> Result {
+        if updates.len() > SIZE * SIZE {
+            return Err(Error::RequestTooBig);
+        }
+
+        let mut state = self.state.lock().expect("poisoned");
+        assert!(state.len() < (SIZE * SIZE));
+
+        for Update { point, color } in updates {
+            if point.x >= SIZE as u16 || point.y >= SIZE as u16 {
+                continue;
+            }
+            state.insert(point, color);
+        }
+
+        Ok(())
     }
 
-    pub async fn create_ticket(&self, ticket_fc: TicketForCreate) -> Result<Ticket> {
-        let mut store = self.tickets_store.lock().expect("poisoned");
-        let id = store.len() as u64;
-        let ticket = Ticket {
-            id,
-            title: ticket_fc.title,
-        };
-        store.push(Some(ticket.clone()));
-        Ok(ticket)
-    }
-
-    pub async fn list_tickets(&self) -> Result<Vec<Ticket>> {
-        let store = self.tickets_store.lock().expect("POISONED");
-        let tickets = store.iter().flatten().cloned().collect();
-        Ok(tickets)
-    }
-
-    pub async fn delete_ticket(&self, id: u64) -> Result<Ticket> {
-        let mut store = self.tickets_store.lock().expect("poisoned");
-        store
-            .get_mut(id as usize)
-            .and_then(|t| t.take())
-            .ok_or(Error::TicketIdNotFound(id))
+    pub async fn get_state(&self) -> Result<Updates> {
+        let state = self.state.lock().expect("POISONED");
+        let updates = state
+            .iter()
+            .map(|(p, c)| Update {
+                point: p.clone(),
+                color: c.clone(),
+            })
+            .collect();
+        Ok(Updates(updates))
     }
 }

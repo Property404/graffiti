@@ -2,23 +2,23 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Default)]
 #[serde(default)]
-struct Color {
-    red: u8,
-    green: u8,
-    blue: u8,
+pub struct Color {
+    pub red: u8,
+    pub green: u8,
+    pub blue: u8,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
+pub struct Point {
+    pub x: u16,
+    pub y: u16,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
-struct Point {
-    x: u32,
-    y: u32,
+pub struct Update {
+    pub point: Point,
+    pub color: Color,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
-struct Update {
-    point: Point,
-    color: Color,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
-struct Updates(Vec<Update>);
+pub struct Updates(pub Vec<Update>);

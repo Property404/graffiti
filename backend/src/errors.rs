@@ -10,6 +10,8 @@ pub enum Error {
     AuthFail,
     #[error("Ticket ID not found: {0}")]
     TicketIdNotFound(u64),
+    #[error("Request too big")]
+    RequestTooBig,
 }
 
 pub type Result<T = (), E = Error> = std::result::Result<T, E>;
