@@ -1,4 +1,4 @@
-use crate::api::{Color, Point, StateResponse, Update, Updates};
+use crate::api::{Color, Point, StateResponse, Update};
 use crate::model::ModelController;
 use crate::Result;
 use axum::{
@@ -21,8 +21,8 @@ pub fn routes(mc: ModelController) -> Router {
         .with_state(mc)
 }
 
-async fn update_state(State(mc): State<ModelController>, Json(updates): Json<Updates>) -> Result {
-    mc.update_state(updates).await
+async fn update_state(State(mc): State<ModelController>, Json(update): Json<Update>) -> Result {
+    mc.update_state(update).await
 }
 
 async fn get_state(State(mc): State<ModelController>) -> Result<Json<StateResponse>> {
