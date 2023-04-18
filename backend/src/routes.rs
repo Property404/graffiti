@@ -10,7 +10,8 @@ use axum::{
 use futures_util::stream::{self, Stream};
 use serde_json::json;
 use std::{convert::Infallible, net::SocketAddr, time::Duration};
-use tokio_stream::StreamExt;
+use tokio::sync::mpsc::channel;
+use tokio_stream::{wrappers::BroadcastStream, StreamExt};
 
 pub fn routes(mc: ModelController) -> Router {
     Router::new()
@@ -29,11 +30,10 @@ async fn get_state(State(mc): State<ModelController>) -> Result<Json<Updates>> {
     Ok(Json(state))
 }
 
-async fn sse_handler() -> Sse<impl Stream<Item = Result<Event, Infallible>>> {
-    // A `Stream` that repeats an event every second
-    let stream = stream::repeat_with(|| Event::default().data("hi!"))
-        .map(Ok)
-        .throttle(Duration::from_secs(1));
+async fn sse_handler(State(mc): State<ModelController>) -> Sse<impl Stream<Item = Result<Event>>> {
+    let stream = BroadcastStream::new(mc.tx.subscribe())
+        .map(|updates| Event::default().json_data(updates.unwrap()).unwrap())
+        .map(Ok);
 
     Sse::new(stream).keep_alive(KeepAlive::default())
 }

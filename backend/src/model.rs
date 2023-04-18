@@ -5,12 +5,26 @@ use std::{
     collections::HashMap,
     sync::{Arc, Mutex},
 };
+use tokio::sync::broadcast::{channel, Receiver, Sender};
+use tokio_stream::wrappers::BroadcastStream;
 
-const SIZE: usize = 256;
+const SIZE: usize = 1024;
+const CHANNEL_WIDTH: usize = 32;
 
-#[derive(Clone, Default)]
+#[derive(Clone)]
 pub struct ModelController {
     state: Arc<Mutex<HashMap<Point, Color>>>,
+    pub tx: Sender<Updates>,
+}
+
+impl Default for ModelController {
+    fn default() -> Self {
+        let (tx, _) = channel(CHANNEL_WIDTH);
+        ModelController {
+            state: Default::default(),
+            tx,
+        }
+    }
 }
 
 impl ModelController {
