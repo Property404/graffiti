@@ -6,7 +6,6 @@ edition = "2021"
 
 [dependencies]
 axum = "0.6.15"
-drawgan-api = { path = "../api" }
 futures-util = "0.3.28"
 serde = { version = "1.0.160", features = ["derive"] }
 serde_json = "1.0.96"

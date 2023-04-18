@@ -1,4 +1,5 @@
 #![allow(unused)]
+mod api;
 mod errors;
 mod model;
 mod routes;
@@ -10,7 +11,6 @@ use axum::{
     routing::{get, get_service, post},
     Router,
 };
-pub use drawgan_api as api;
 use errors::{Error, Result};
 use model::ModelController;
 use serde::Deserialize;
