@@ -4,12 +4,6 @@ use axum::{
 };
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
-    #[error("Login failed")]
-    LoginFail,
-    #[error("Authentication failure")]
-    AuthFail,
-    #[error("Ticket ID not found: {0}")]
-    TicketIdNotFound(u64),
     #[error("Request too big")]
     RequestTooBig,
 }
