@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Default)]
 #[serde(default)]
@@ -20,5 +21,10 @@ pub struct Update {
     pub color: Color,
 }
 
+/// List of updates to apply.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct Updates(pub Vec<Update>);
+
+/// The whole board.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct StateResponse(pub HashMap<Point, Color>);

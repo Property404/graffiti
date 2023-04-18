@@ -1,4 +1,4 @@
-use crate::api::{Color, Point, Update, Updates};
+use crate::api::{Color, Point, StateResponse, Update, Updates};
 use crate::errors::{Error, Result};
 use serde::{Deserialize, Serialize};
 use std::{
@@ -46,15 +46,8 @@ impl ModelController {
         Ok(())
     }
 
-    pub async fn get_state(&self) -> Result<Updates> {
+    pub async fn get_state(&self) -> Result<StateResponse> {
         let state = self.state.lock().expect("POISONED");
-        let updates = state
-            .iter()
-            .map(|(p, c)| Update {
-                point: p.clone(),
-                color: c.clone(),
-            })
-            .collect();
-        Ok(Updates(updates))
+        Ok(StateResponse(state.clone()))
     }
 }
