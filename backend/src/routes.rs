@@ -22,6 +22,7 @@ pub fn routes(mc: ModelController) -> Router {
 }
 
 async fn update_state(State(mc): State<ModelController>, Json(update): Json<Update>) -> Result {
+    mc.tx.send(update.clone());
     mc.update_state(update).await
 }
 

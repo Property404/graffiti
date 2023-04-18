@@ -24,7 +24,7 @@ async fn main() -> Result {
     let mc = ModelController::default();
 
     let routes_merged = Router::new()
-        .merge(routes::routes(mc))
+        .nest_service("/api", routes::routes(mc))
         .merge(routes_static());
 
     let addr = SocketAddr::from(([127, 0, 0, 1], 8080));
