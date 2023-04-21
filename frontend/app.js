@@ -2,9 +2,9 @@
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d")
 const size = 1024;
-const sse = new EventSource("/api/feed");
 
-
+let color = {red: 255, green:0, blue:0};
+let radius = 10;
 
 function rgbToHex(r, g, b) {
     function componentToHex(c) {
@@ -13,9 +13,6 @@ function rgbToHex(r, g, b) {
     }
     return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
 }
-
-let color = {red: 255, green:0, blue:0};
-let radius = 10;
 
 function form_update_from_rect(x, y, r) {
     return {
@@ -60,25 +57,46 @@ function apply_update(update) {
     ctx.fillRect(start_x, start_y, end_x - start_x, end_y - start_y);
 }
 
-canvas.addEventListener("mousedown", function(e) {
-    const draw = function(e) {
-        const mousex = size * (e.offsetX / canvas.clientWidth)
-        const mousey = size * (e.offsetY / canvas.clientHeight)
-        const update = form_update_from_rect(mousex, mousey, radius);
-        apply_update(update);
-        send_update(update);
-    };
+async function main() {
+    console.log("Loading previous state...");
+    const state = await (await fetch("/api/state")).json();
 
-    draw(e);
-    canvas.onmousemove = draw;
+    for (const pair of state) {
+        ctx.fillStyle = rgbToHex(pair[1].red,pair[1].green,pair[1].blue);
+        ctx.fillRect(pair[0].x, pair[0].y, 1, 1);
+    }
 
-    canvas.onmouseup = function() {
-        console.log("bye");
-        canvas.onmousemove = null;
-        canvas.onmouseup = null;
-    };
-});
 
-sse.addEventListener("message", (e) => {
-    apply_update(JSON.parse(e.data));
-});
+    console.log("Setting up event listeners...");
+
+
+    canvas.addEventListener("mousedown", function(e) {
+        const draw = function(e) {
+            const mousex = size * (e.offsetX / canvas.clientWidth)
+            const mousey = size * (e.offsetY / canvas.clientHeight)
+            const update = form_update_from_rect(mousex, mousey, radius);
+            apply_update(update);
+            send_update(update);
+        };
+
+        draw(e);
+        canvas.onmousemove = draw;
+
+        canvas.onmouseup = function() {
+            console.log("bye");
+            canvas.onmousemove = null;
+            canvas.onmouseup = null;
+        };
+    });
+
+    console.log("Setting up SSE");
+
+    const sse = new EventSource("/api/feed");
+    sse.addEventListener("message", (e) => {
+        apply_update(JSON.parse(e.data));
+    });
+
+    console.log("Ready!");
+}
+
+main()
