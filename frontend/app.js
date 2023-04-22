@@ -57,23 +57,33 @@ function apply_update(update) {
     ctx.fillRect(start_x, start_y, end_x - start_x, end_y - start_y);
 }
 
-async function main() {
-    console.log("Loading previous state...");
+async function restoreCanvas() {
     const state = new Uint32Array(await (await fetch("/api/state")).arrayBuffer());
+    const canvas_data = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    let red,green,blue = 0;
     for (let code of state) {
         if (code & 0x80000000) {
             code &= ~0x80000000;
             const x = code >> 16;
             const y = code & 0xFFFF;
-            ctx.fillRect(x, y, 1, 1);
+            const index = (x + y * canvas.width) * 4;
+            canvas_data.data[index + 0] = red;
+            canvas_data.data[index + 1] = green;
+            canvas_data.data[index + 2] = blue;
+            canvas_data.data[index + 3] = 255;
         } else {
-            const red = (code >> 16)&0xFF;
-            const green = (code >> 8)&0xFF;
-            const blue = code&0xFF;
-            ctx.fillStyle = rgbToHex(red,green,blue);;
+            red = (code >> 16)&0xFF;
+            green = (code >> 8)&0xFF;
+            blue = code&0xFF;
         }
     }
+    ctx.putImageData(canvas_data, 0, 0);
+}
 
+async function main() {
+    console.log("Loading previous state...");
+
+    restoreCanvas().await;
 
     console.log("Setting up event listeners...");
 
