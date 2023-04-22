@@ -1,23 +1,13 @@
-#![allow(unused)]
 mod api;
 mod errors;
 mod model;
 mod routes;
 
-use axum::{
-    extract::{Path, Query},
-    middleware,
-    response::{Html, IntoResponse, Response},
-    routing::{get, get_service, post},
-    Router,
-};
+use axum::{routing::get_service, Router};
 use errors::{Error, Result};
 use model::ModelController;
-use serde::Deserialize;
-use std::{convert::Infallible, net::SocketAddr, time::Duration};
+use std::net::SocketAddr;
 use tower_http::services::ServeDir;
-
-const STYLE: &str = "<style>html{background-color:black;color:white}</style>";
 
 #[tokio::main]
 async fn main() -> Result {

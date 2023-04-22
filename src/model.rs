@@ -1,12 +1,10 @@
 use crate::api::{Color, Point, Update};
-use crate::errors::{Error, Result};
-use serde::{Deserialize, Serialize};
+use crate::errors::Result;
 use std::{
     collections::HashMap,
     sync::{Arc, Mutex},
 };
-use tokio::sync::broadcast::{channel, Receiver, Sender};
-use tokio_stream::wrappers::BroadcastStream;
+use tokio::sync::broadcast::{channel, Sender};
 
 const SIZE: usize = 1024;
 const CHANNEL_WIDTH: usize = 32;

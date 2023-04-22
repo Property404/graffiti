@@ -1,19 +1,16 @@
-use crate::api::{Color, Point, Update};
+use crate::api::Update;
 use crate::model::ModelController;
-use crate::Result;
+use crate::{Error, Result};
 use axum::{
-    extract::{Path, State},
+    extract::State,
     response::{
         sse::{Event, KeepAlive, Sse},
         IntoResponse,
     },
-    routing::{delete, get, post},
+    routing::{get, post},
     Json, Router,
 };
-use futures_util::stream::{self, Stream};
-use serde_json::json;
-use std::{convert::Infallible, net::SocketAddr, time::Duration};
-use tokio::sync::mpsc::channel;
+use futures_util::stream::Stream;
 use tokio_stream::{wrappers::BroadcastStream, StreamExt};
 
 pub fn routes(mc: ModelController) -> Router {
@@ -25,7 +22,9 @@ pub fn routes(mc: ModelController) -> Router {
 }
 
 async fn update_state(State(mc): State<ModelController>, Json(update): Json<Update>) -> Result {
-    mc.tx.send(update.clone());
+    mc.tx
+        .send(update.clone())
+        .map_err(|e| Error::SendError(e.to_string()))?;
     mc.update_state(update).await
 }
 

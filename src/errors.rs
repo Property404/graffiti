@@ -2,10 +2,11 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
+
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
-    #[error("Request too big")]
-    RequestTooBig,
+    #[error("Could not send through channel: {0}")]
+    SendError(String),
 }
 
 pub type Result<T = (), E = Error> = std::result::Result<T, E>;
