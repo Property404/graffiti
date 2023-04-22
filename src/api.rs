@@ -9,10 +9,22 @@ pub struct Color {
     pub blue: u8,
 }
 
+impl From<Color> for u32 {
+    fn from(Color { red, green, blue }: Color) -> Self {
+        ((red as u32) << 16) + ((green as u32) << 8) + (blue as u32)
+    }
+}
+
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct Point {
     pub x: u16,
     pub y: u16,
+}
+
+impl From<Point> for u32 {
+    fn from(Point { x, y }: Point) -> Self {
+        0x80000000 + ((x as u32) << 16) + (y as u32)
+    }
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
@@ -45,6 +57,26 @@ impl Update {
     }
 }
 
-/// The whole board.
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
-pub struct StateResponse(pub Vec<(Point, Color)>);
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn conversions() {
+        assert_eq!(u32::from(Point { x: 0, y: 0 }), 0x80000000);
+        assert_eq!(
+            u32::from(Point {
+                x: 0x0234,
+                y: 0x5678
+            }),
+            0x82345678
+        );
+        assert_eq!(
+            u32::from(Point {
+                x: 0x1234,
+                y: 0x5678
+            }),
+            0x92345678
+        );
+    }
+}

@@ -1,9 +1,12 @@
-use crate::api::{Color, Point, StateResponse, Update};
+use crate::api::{Color, Point, Update};
 use crate::model::ModelController;
 use crate::Result;
 use axum::{
     extract::{Path, State},
-    response::sse::{Event, KeepAlive, Sse},
+    response::{
+        sse::{Event, KeepAlive, Sse},
+        IntoResponse,
+    },
     routing::{delete, get, post},
     Json, Router,
 };
@@ -26,8 +29,8 @@ async fn update_state(State(mc): State<ModelController>, Json(update): Json<Upda
     mc.update_state(update).await
 }
 
-async fn get_state(State(mc): State<ModelController>) -> Result<Json<StateResponse>> {
-    let state = Json(mc.get_state().await?);
+async fn get_state(State(mc): State<ModelController>) -> Result<impl IntoResponse> {
+    let state = mc.get_state().await?;
     Ok(state)
 }
 

@@ -1,4 +1,4 @@
-use crate::api::{Color, Point, StateResponse, Update};
+use crate::api::{Color, Point, Update};
 use crate::errors::{Error, Result};
 use serde::{Deserialize, Serialize};
 use std::{
@@ -42,9 +42,17 @@ impl ModelController {
         Ok(())
     }
 
-    pub async fn get_state(&self) -> Result<StateResponse> {
+    pub async fn get_state(&self) -> Result<Vec<u8>> {
         let state = self.state.lock().expect("POISONED");
-        let state = state.iter().map(|(a, b)| (*a, *b)).collect();
-        Ok(StateResponse(state))
+        let mut response = Vec::with_capacity(state.len());
+        let mut last_color = None;
+        for (point, color) in state.iter() {
+            if last_color != Some(color) {
+                last_color = Some(color);
+                response.extend(u32::from(*color).to_le_bytes())
+            }
+            response.extend(u32::from(*point).to_le_bytes());
+        }
+        Ok(response)
     }
 }

@@ -59,11 +59,19 @@ function apply_update(update) {
 
 async function main() {
     console.log("Loading previous state...");
-    const state = await (await fetch("/api/state")).json();
-
-    for (const pair of state) {
-        ctx.fillStyle = rgbToHex(pair[1].red,pair[1].green,pair[1].blue);
-        ctx.fillRect(pair[0].x, pair[0].y, 1, 1);
+    const state = new Uint32Array(await (await fetch("/api/state")).arrayBuffer());
+    for (let code of state) {
+        if (code & 0x80000000) {
+            code &= ~0x80000000;
+            const x = code >> 16;
+            const y = code & 0xFFFF;
+            ctx.fillRect(x, y, 1, 1);
+        } else {
+            const red = (code >> 16)&0xFF;
+            const green = (code >> 8)&0xFF;
+            const blue = code&0xFF;
+            ctx.fillStyle = rgbToHex(red,green,blue);;
+        }
     }
 
 
