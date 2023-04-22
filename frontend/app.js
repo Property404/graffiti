@@ -1,7 +1,8 @@
 "use strict";
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d")
-const size = 1024;
+const canvas_width = canvas.width;
+const canvas_height = canvas.height;
 
 let color = {
     red: 255,
@@ -25,8 +26,8 @@ function form_update_from_rect(x, y, r) {
             y: Math.max(y - r, 0),
         },
         end: {
-            x: Math.min(x + r, size),
-            y: Math.min(y + r, size),
+            x: Math.min(x + r, canvas_width),
+            y: Math.min(y + r, canvas_height),
         },
         color: color
     }
@@ -48,8 +49,8 @@ function apply_update(update) {
     const end_x = update?.end?.x;
     const start_y = update?.start?.y;
     const end_y = update?.end?.y;
-    if (start_x == null || start_y == null || start_x >= size || start_x > end_x ||
-        start_y >= size || start_y > end_y) {
+    if (start_x == null || start_y == null || start_x >= canvas_width || start_x > end_x ||
+        start_y >= canvas_height || start_y > end_y) {
         console.log("Bad update");
         return;
     }
@@ -94,8 +95,8 @@ async function main() {
 
     canvas.addEventListener("mousedown", function(e) {
         const draw = function(e) {
-            const mousex = size * (e.offsetX / canvas.clientWidth)
-            const mousey = size * (e.offsetY / canvas.clientHeight)
+            const mousex = canvas_width * (e.offsetX / canvas.clientWidth)
+            const mousey = canvas_height * (e.offsetY / canvas.clientHeight)
             const update = form_update_from_rect(mousex, mousey, radius);
             apply_update(update);
             send_update(update);
