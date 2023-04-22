@@ -3,7 +3,11 @@ const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d")
 const size = 1024;
 
-let color = {red: 255, green:0, blue:0};
+let color = {
+    red: 255,
+    green: 0,
+    blue: 0
+};
 let radius = 10;
 
 function rgbToHex(r, g, b) {
@@ -44,8 +48,8 @@ function apply_update(update) {
     const end_x = update?.end?.x;
     const start_y = update?.start?.y;
     const end_y = update?.end?.y;
-    if (start_x == null || start_y == null || start_x >= size || start_x > end_x
-        || start_y >= size || start_y > end_y ) {
+    if (start_x == null || start_y == null || start_x >= size || start_x > end_x ||
+        start_y >= size || start_y > end_y) {
         console.log("Bad update");
         return;
     }
@@ -60,7 +64,7 @@ function apply_update(update) {
 async function restoreCanvas() {
     const state = new Uint32Array(await (await fetch("/api/state")).arrayBuffer());
     const canvas_data = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    let red,green,blue = 0;
+    let red, green, blue = 0;
     for (let code of state) {
         if (code & 0x80000000) {
             code &= ~0x80000000;
@@ -72,9 +76,9 @@ async function restoreCanvas() {
             canvas_data.data[index + 2] = blue;
             canvas_data.data[index + 3] = 255;
         } else {
-            red = (code >> 16)&0xFF;
-            green = (code >> 8)&0xFF;
-            blue = code&0xFF;
+            red = (code >> 16) & 0xFF;
+            green = (code >> 8) & 0xFF;
+            blue = code & 0xFF;
         }
     }
     ctx.putImageData(canvas_data, 0, 0);
