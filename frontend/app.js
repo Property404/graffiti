@@ -88,6 +88,34 @@ async function restoreCanvas() {
     ctx.putImageData(canvas_data, 0, 0);
 }
 
+function draw_rect(old_x, old_y, mouse_x, mouse_y) {
+    const updates = [
+        form_update_from_rect(mouse_x, mouse_y, radius),
+    ]
+
+    const num_steps = 4;
+    const delta_x = (mouse_x - old_x) / num_steps;
+    const delta_y = (mouse_y - old_y) / num_steps;
+
+    if (old_x !== null) {
+        for (let step = 1; step < num_steps; step++) {
+            updates.push(form_update_from_rect(old_x + delta_x * step, old_y + delta_y * step, radius))
+        }
+    }
+
+    for (const update of updates) {
+        apply_update(update);
+        send_update(update);
+    }
+
+}
+
+function calc_mouse_positions(e) {
+    const mouse_x = canvas_width * (e.offsetX / canvas.clientWidth);
+    const mouse_y = canvas_height * (e.offsetY / canvas.clientHeight);
+    return [mouse_x, mouse_y];
+}
+
 async function main() {
     console.log("Loading previous state...");
 
@@ -99,28 +127,10 @@ async function main() {
     canvas.addEventListener("mousedown", function(e) {
         let old_x = null;
         let old_y = null;
+
         const draw = function(e) {
-            const mouse_x = canvas_width * (e.offsetX / canvas.clientWidth)
-            const mouse_y = canvas_height * (e.offsetY / canvas.clientHeight)
-            const updates = [
-                form_update_from_rect(mouse_x, mouse_y, radius),
-            ]
-
-            const num_steps = 4;
-            const delta_x = (mouse_x - old_x) / num_steps;
-            const delta_y = (mouse_y - old_y) / num_steps;
-
-            if (old_x !== null) {
-                for (let step = 1; step < num_steps; step++) {
-                    updates.push(form_update_from_rect(old_x + delta_x * step, old_y + delta_y * step, radius))
-                }
-            }
-
-            for (const update of updates) {
-                apply_update(update);
-                send_update(update);
-            }
-
+            const [mouse_x, mouse_y] = calc_mouse_positions(e)
+            draw_rect(old_x, old_y, mouse_x, mouse_y);
             old_x = mouse_x;
             old_y = mouse_y;
         };
