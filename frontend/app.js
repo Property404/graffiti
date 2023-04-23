@@ -10,6 +10,7 @@ let color = {
     blue: 0
 };
 let radius = 10;
+let shape = "square";
 
 function rgbToHex(r, g, b) {
     function componentToHex(c) {
@@ -19,20 +20,16 @@ function rgbToHex(r, g, b) {
     return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
 }
 
-function form_update_from_rect(x, y, r) {
+function form_update(x, y, radius, shape) {
     x = Math.floor(x)
     y = Math.floor(y)
-    r = Math.floor(r)
+    radius = Math.floor(radius)
     return {
-        start: {
-            x: Math.max(x - r, 0),
-            y: Math.max(y - r, 0),
-        },
-        end: {
-            x: Math.min(x + r, canvas_width),
-            y: Math.min(y + r, canvas_height),
-        },
-        color: color
+        x,
+        y,
+        radius,
+        color,
+        shape
     }
 }
 
@@ -48,21 +45,27 @@ function send_update(update) {
 }
 
 function apply_update(update) {
-    const start_x = update?.start?.x;
-    const end_x = update?.end?.x;
-    const start_y = update?.start?.y;
-    const end_y = update?.end?.y;
-    if (start_x == null || start_y == null || start_x >= canvas_width || start_x > end_x ||
-        start_y >= canvas_height || start_y > end_y) {
+    const x = update?.x;
+    const y = update?.y;
+    const radius = update?.radius;
+    if (x == null | y == null || x < 0 || x >= canvas_width || y < 0 || y >=
+        canvas_height || radius == null || radius < 0 || radius >=
+        canvas_width) {
         console.log("Bad update");
         return;
     }
 
-    if (color !== null) {
+    if (update?.color !== null) {
         const hex = rgbToHex(color.red, color.green, color.blue);
         ctx.fillStyle = hex;
     }
-    ctx.fillRect(start_x, start_y, end_x - start_x, end_y - start_y);
+    if (update.shape === "square") {
+        ctx.fillRect(x - radius, y - radius, radius * 2, radius * 2)
+    } else if (update.shape === "circle") {
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, Math.PI * 2);
+        ctx.fill();
+    }
 }
 
 async function restoreCanvas() {
@@ -88,9 +91,9 @@ async function restoreCanvas() {
     ctx.putImageData(canvas_data, 0, 0);
 }
 
-function draw_rect(old_x, old_y, mouse_x, mouse_y) {
+function draw_shape(old_x, old_y, mouse_x, mouse_y) {
     const updates = [
-        form_update_from_rect(mouse_x, mouse_y, radius),
+        form_update(mouse_x, mouse_y, radius, shape),
     ]
 
     const num_steps = 4;
@@ -99,7 +102,7 @@ function draw_rect(old_x, old_y, mouse_x, mouse_y) {
 
     if (old_x !== null) {
         for (let step = 1; step < num_steps; step++) {
-            updates.push(form_update_from_rect(old_x + delta_x * step, old_y + delta_y * step, radius))
+            updates.push(form_update(old_x + delta_x * step, old_y + delta_y * step, radius, shape))
         }
     }
 
@@ -130,7 +133,7 @@ async function main() {
 
         const draw = function(e) {
             const [mouse_x, mouse_y] = calc_mouse_positions(e)
-            draw_rect(old_x, old_y, mouse_x, mouse_y);
+            draw_shape(old_x, old_y, mouse_x, mouse_y);
             old_x = mouse_x;
             old_y = mouse_y;
         };

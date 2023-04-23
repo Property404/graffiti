@@ -30,7 +30,7 @@ impl ModelController {
         let mut state = self.state.lock().expect("poisoned");
         assert!(state.len() < (SIZE * SIZE));
 
-        for (point, color) in update.to_map() {
+        for (point, color) in update.into_map() {
             if point.x >= SIZE as u16 || point.y >= SIZE as u16 {
                 continue;
             }
