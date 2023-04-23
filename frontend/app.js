@@ -20,6 +20,9 @@ function rgbToHex(r, g, b) {
 }
 
 function form_update_from_rect(x, y, r) {
+    x = Math.floor(x)
+    y = Math.floor(y)
+    r = Math.floor(r)
     return {
         start: {
             x: Math.max(x - r, 0),
@@ -106,7 +109,6 @@ async function main() {
         canvas.onmousemove = draw;
 
         canvas.onmouseup = function() {
-            console.log("bye");
             canvas.onmousemove = null;
             canvas.onmouseup = null;
         };
