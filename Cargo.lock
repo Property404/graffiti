@@ -87,19 +87,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
-name = "drawgan-backend"
-version = "0.1.0"
-dependencies = [
- "axum",
- "futures-util",
- "serde",
- "thiserror",
- "tokio",
- "tokio-stream",
- "tower-http",
-]
-
-[[package]]
 name = "fnv"
 version = "1.0.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -164,6 +151,19 @@ dependencies = [
  "pin-project-lite",
  "pin-utils",
  "slab",
+]
+
+[[package]]
+name = "graffiti"
+version = "0.1.0"
+dependencies = [
+ "axum",
+ "futures-util",
+ "serde",
+ "thiserror",
+ "tokio",
+ "tokio-stream",
+ "tower-http",
 ]
 
 [[package]]

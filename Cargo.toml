@@ -1,8 +1,9 @@
 [package]
-name = "drawgan-backend"
+name = "graffiti"
 authors = ["Dagan Martinez"]
 version = "0.1.0"
 edition = "2021"
+license = "MIT or Apache-2.0"
 
 [dependencies]
 axum = "0.6.15"
