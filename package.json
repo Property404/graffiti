@@ -1,0 +1,23 @@
+{
+  "name": "graffiti-frontend",
+  "scripts": {
+    "format": "js-beautify -r --end-with-newline frontend/*.js",
+    "lint": "eslint frontend/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Property404/graffiti"
+  },
+  "keywords": [
+  ],
+  "author": "Dagan Martinez <dont-email-me-you-scrub@dagans.dev>",
+  "license": "MIT or Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/Property404/graffiti/issues"
+  },
+  "homepage": "https://github.com/Property404/graffiti",
+  "devDependencies": {
+    "eslint": "^8.29.0",
+    "js-beautify": "^1.14.7"
+  }
+}
