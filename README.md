@@ -4,7 +4,7 @@ Draw with your friends!
 
 ## Running Locally
 
-* `cargo run`
+* `cargo run -- --public ./frontend/`
 * Open web browser to `http://localhost:8080`
 
 ## License
