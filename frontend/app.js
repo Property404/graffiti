@@ -1,11 +1,13 @@
 "use strict";
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d")
-const canvas_width = canvas.width;
-const canvas_height = canvas.height;
+const canvas_width = 1024;
+const canvas_height = 1024;
+canvas.width = canvas_width
+canvas.height = canvas_height
 
 let color = {
-    red: 255,
+    red: 0,
     green: 0,
     blue: 0
 };
@@ -18,6 +20,15 @@ function rgbToHex(r, g, b) {
         return hex.length == 1 ? "0" + hex : hex;
     }
     return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+}
+
+function hexToRgb(hex) {
+    const val = parseInt(hex.substr(1), 16);
+    return {
+        red: (val >> 16) & 255,
+        green: (val >> 8) & 255,
+        blue: val & 255,
+    }
 }
 
 function form_update(x, y, radius, shape) {
@@ -42,6 +53,11 @@ function send_update(update) {
         },
         body: JSON.stringify(update)
     })
+}
+
+function update_color() {
+    const color_value = document.getElementById("color-button").value;
+    color = hexToRgb(color_value);
 }
 
 function apply_update(update) {
@@ -151,12 +167,18 @@ async function main() {
         }
     });
 
+    document.getElementById("color-button").onchange = update_color;
+
     console.log("Setting up SSE");
 
     const sse = new EventSource("/api/feed");
     sse.addEventListener("message", (e) => {
         apply_update(JSON.parse(e.data));
     });
+
+    console.log("Miscellaneous");
+
+    update_color();
 
     console.log("Ready!");
 }
