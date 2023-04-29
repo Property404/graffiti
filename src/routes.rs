@@ -35,9 +35,9 @@ async fn get_state(State(mc): State<ModelController>) -> Result<impl IntoRespons
 
 async fn sse_handler(State(mc): State<ModelController>) -> Sse<impl Stream<Item = Result<Event>>> {
     let stream = BroadcastStream::new(mc.tx.subscribe()).map(|updates| {
-        Event::default()
-            .json_data(updates.unwrap())
-            .map_err(Error::from)
+        updates
+            .map_err(|e| Error::Receive(e.to_string()))
+            .and_then(|updates| Event::default().json_data(updates).map_err(Error::from))
     });
 
     Sse::new(stream).keep_alive(KeepAlive::default())
