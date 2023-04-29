@@ -57,8 +57,9 @@ function send_update(update) {
     })
 }
 
-function update_color() {
+function update_brush() {
     const color_value = document.getElementById("color-button").value;
+    radius = document.getElementById("radius-slider").value;
     color = hexToRgb(color_value);
 }
 
@@ -140,7 +141,7 @@ function calc_mouse_positions(e) {
 async function main() {
     restoreCanvas().await;
 
-    update_color();
+    update_brush();
 
     canvas.addEventListener("mousedown", function(e) {
         let old_x = null;
@@ -166,7 +167,8 @@ async function main() {
         }
     });
 
-    document.getElementById("color-button").onchange = update_color;
+    document.getElementById("radius-slider").onchange = update_brush;
+    document.getElementById("color-button").onchange = update_brush;
 
     const sse = new EventSource("/api/feed");
     sse.addEventListener("message", (e) => {
