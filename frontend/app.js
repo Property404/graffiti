@@ -73,7 +73,7 @@ function apply_update(update) {
     }
 
     if (update?.color !== null) {
-        const hex = rgbToHex(color.red, color.green, color.blue);
+        const hex = rgbToHex(update?.color?.red, update?.color?.green, update?.color?.blue);
         ctx.fillStyle = hex;
     }
     if (update.shape === "square") {
