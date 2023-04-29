@@ -21,6 +21,9 @@ html,body{
     height:100%;
     margin:0;
     padding:0;
+    display: flex;
+    justify-content:center;
+    align-items:center;
 }
 
 body {
@@ -28,11 +31,15 @@ body {
     padding:0;
     width:100%;
     height:100%;
+    background-color:darkgrey;
+}
+
+#main{
+    width:100%;
+    height:100%;
     display: flex;
     flex-direction:column;
     justify-content:space-between;
-    flex-shrink:3;
-    background-color:darkgrey;
 }
 
 #toolbar {

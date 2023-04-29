@@ -1,5 +1,7 @@
 "use strict";
 const canvas = document.querySelector("canvas");
+const loading_text = document.getElementById("loading-text");
+const main_container = document.getElementById("main");
 const ctx = canvas.getContext("2d")
 const canvas_width = 1024;
 const canvas_height = 1024;
@@ -136,12 +138,9 @@ function calc_mouse_positions(e) {
 }
 
 async function main() {
-    console.log("Loading previous state...");
-
     restoreCanvas().await;
 
-    console.log("Setting up event listeners...");
-
+    update_color();
 
     canvas.addEventListener("mousedown", function(e) {
         let old_x = null;
@@ -169,18 +168,14 @@ async function main() {
 
     document.getElementById("color-button").onchange = update_color;
 
-    console.log("Setting up SSE");
-
     const sse = new EventSource("/api/feed");
     sse.addEventListener("message", (e) => {
         apply_update(JSON.parse(e.data));
     });
 
-    console.log("Miscellaneous");
-
-    update_color();
-
-    console.log("Ready!");
+    // Show canvas/toolbar and hide loading text
+    loading_text.setAttribute("hidden", true);
+    main_container.style = "";
 }
 
 main()
