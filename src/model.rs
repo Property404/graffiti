@@ -28,7 +28,9 @@ impl Default for ModelController {
 impl ModelController {
     pub async fn update_state(&self, update: Update) -> Result {
         let mut state = self.state.lock().expect("poisoned");
-        assert!(state.len() < (SIZE * SIZE));
+        if state.len() > SIZE * SIZE {
+            panic!("Bad length: {}", state.len());
+        }
 
         for (point, color) in update.into_map() {
             if point.x >= SIZE as u16 || point.y >= SIZE as u16 {
