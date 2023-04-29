@@ -137,7 +137,13 @@ function calc_mouse_positions(e) {
 }
 
 async function main() {
-    restoreCanvas().await;
+    try {
+        await restoreCanvas();
+    } catch (e) {
+        loading_text.textContent = "Encountered error restoring canvas. Backend may not be running";
+        console.error("Actual error: ", e)
+        return;
+    }
 
     update_brush();
 

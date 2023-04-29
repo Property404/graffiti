@@ -24,6 +24,7 @@ html,body{
     display: flex;
     justify-content:center;
     align-items:center;
+    font-family: sans-serif;
 }
 
 body {
@@ -67,6 +68,11 @@ input:hover,button:hover {
     cursor:pointer;
     pointer:cursor;
     background-color: white;;
+}
+
+#loading-text {
+    font-size:2rem;
+    text-align:center;
 }
 
 @media (min:500px) {
