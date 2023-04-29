@@ -21,8 +21,7 @@ async fn main() -> Result {
     println!("->> LISTENING on {addr}\n");
     axum::Server::bind(&addr)
         .serve(routes_merged.into_make_service())
-        .await
-        .unwrap();
+        .await?;
 
     Ok(())
 }

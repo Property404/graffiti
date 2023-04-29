@@ -6,7 +6,11 @@ use axum::{
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
     #[error("Could not send through channel: {0}")]
-    SendError(String),
+    Send(String),
+    #[error(transparent)]
+    Hyper(#[from] hyper::Error),
+    #[error(transparent)]
+    Json(#[from] serde_json::Error),
 }
 
 pub type Result<T = (), E = Error> = std::result::Result<T, E>;

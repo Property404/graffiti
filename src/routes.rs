@@ -24,7 +24,7 @@ pub fn routes(mc: ModelController) -> Router {
 async fn update_state(State(mc): State<ModelController>, Json(update): Json<Update>) -> Result {
     mc.tx
         .send(update.clone())
-        .map_err(|e| Error::SendError(e.to_string()))?;
+        .map_err(|e| Error::Send(e.to_string()))?;
     mc.update_state(update).await
 }
 
@@ -34,9 +34,11 @@ async fn get_state(State(mc): State<ModelController>) -> Result<impl IntoRespons
 }
 
 async fn sse_handler(State(mc): State<ModelController>) -> Sse<impl Stream<Item = Result<Event>>> {
-    let stream = BroadcastStream::new(mc.tx.subscribe())
-        .map(|updates| Event::default().json_data(updates.unwrap()).unwrap())
-        .map(Ok);
+    let stream = BroadcastStream::new(mc.tx.subscribe()).map(|updates| {
+        Event::default()
+            .json_data(updates.unwrap())
+            .map_err(Error::from)
+    });
 
     Sse::new(stream).keep_alive(KeepAlive::default())
 }
