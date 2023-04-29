@@ -47,7 +47,7 @@ function form_update(x, y, radius, shape) {
 }
 
 function send_update(update) {
-    fetch('/api/update', {
+    fetch('./api/update', {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -86,7 +86,7 @@ function apply_update(update) {
 }
 
 async function restoreCanvas() {
-    const state = new Uint32Array(await (await fetch("/api/state")).arrayBuffer());
+    const state = new Uint32Array(await (await fetch("./api/state")).arrayBuffer());
     const canvas_data = ctx.getImageData(0, 0, canvas.width, canvas.height);
     let red, green, blue = 0;
     for (let code of state) {
@@ -168,7 +168,7 @@ async function main() {
     document.getElementById("radius-slider").onchange = update_brush;
     document.getElementById("color-button").onchange = update_brush;
 
-    const sse = new EventSource("/api/feed");
+    const sse = new EventSource("./api/feed");
     sse.addEventListener("message", (e) => {
         apply_update(JSON.parse(e.data));
     });
