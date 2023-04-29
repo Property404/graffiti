@@ -67,10 +67,8 @@ function apply_update(update) {
     const x = update?.x;
     const y = update?.y;
     const radius = update?.radius;
-    if (x == null | y == null || x < 0 || x >= canvas_width || y < 0 || y >=
-        canvas_height || radius == null || radius < 0 || radius >=
-        canvas_width) {
-        console.log("Bad update");
+    if (x == null || y == null || radius == null || radius < 0 || radius >= canvas_width) {
+        console.log("Bad update: ", update);
         return;
     }
 
