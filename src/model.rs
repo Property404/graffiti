@@ -26,20 +26,25 @@ impl Default for ModelController {
 }
 
 impl ModelController {
-    pub async fn update_state(&self, update: Update) -> Result {
+    pub async fn update_state(&self, update: Update) -> Result<bool> {
         let mut state = self.state.lock().expect("poisoned");
         if state.len() > SIZE * SIZE {
             panic!("Bad length: {}", state.len());
         }
 
+        let mut changed = false;
+
         for (point, color) in update.into_map() {
             if point.x >= SIZE as u16 || point.y >= SIZE as u16 {
                 continue;
             }
-            state.insert(point, color);
+            if state.get(&point) != Some(&color) {
+                changed = true;
+                state.insert(point, color);
+            }
         }
 
-        Ok(())
+        Ok(changed)
     }
 
     pub async fn get_state(&self) -> Result<Vec<u8>> {
