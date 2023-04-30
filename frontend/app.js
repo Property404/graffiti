@@ -152,11 +152,12 @@ async function main() {
     restore_settings();
     update_brush();
 
-    canvas.addEventListener("mousedown", function(e) {
+    canvas.onmousedown = canvas.ontouchstart = function(e) {
         let old_x = null;
         let old_y = null;
 
         const draw = function(e) {
+            e.preventDefault();
             const [mouse_x, mouse_y] = calc_mouse_positions(e)
             draw_shape(old_x, old_y, mouse_x, mouse_y);
             old_x = mouse_x;
@@ -165,16 +166,19 @@ async function main() {
 
         draw(e);
         canvas.onmousemove = draw;
+        canvas.ontouchmove = draw;
 
-        canvas.onmouseup = () => {
+        canvas.onmouseup = canvas.ontouchend = () => {
             canvas.onmousemove = null;
             canvas.onmouseup = null;
+            canvas.ontouchmove = null;
+            canvas.ontouchend = null;
         }
         canvas.onmouseleave = () => {
             old_x = null;
             old_y = null;
         }
-    });
+    };
 
     document.getElementById("radius-slider").onchange = update_brush;
     document.getElementById("color-button").onchange = update_brush;
