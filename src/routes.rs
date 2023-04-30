@@ -10,7 +10,7 @@ use axum::{
     routing::{get, post},
     Json, Router,
 };
-use futures_util::stream::Stream;
+use http::header::{self, HeaderName, HeaderValue};
 use tokio_stream::{wrappers::BroadcastStream, StreamExt};
 
 pub fn routes(mc: ModelController) -> Router {
@@ -33,12 +33,27 @@ async fn get_state(State(mc): State<ModelController>) -> Result<impl IntoRespons
     Ok(state)
 }
 
-async fn sse_handler(State(mc): State<ModelController>) -> Sse<impl Stream<Item = Result<Event>>> {
+async fn sse_handler(State(mc): State<ModelController>) -> impl IntoResponse {
+    //Sse<impl Stream<Item = Result<Event>>> {
     let stream = BroadcastStream::new(mc.tx.subscribe()).map(|updates| {
         updates
             .map_err(|e| Error::Receive(e.to_string()))
             .and_then(|updates| Event::default().json_data(updates).map_err(Error::from))
     });
 
-    Sse::new(stream).keep_alive(KeepAlive::default())
+    let mut response = Sse::new(stream)
+        .keep_alive(KeepAlive::default())
+        .into_response();
+    response.headers_mut().insert(
+        header::CONTENT_TYPE,
+        HeaderValue::from_static("text/event-stream"),
+    );
+    response
+        .headers_mut()
+        .insert(header::CACHE_CONTROL, HeaderValue::from_static("no-cache"));
+    response.headers_mut().insert(
+        HeaderName::from_static("x-accel-buffering"),
+        HeaderValue::from_static("no"),
+    );
+    response
 }
