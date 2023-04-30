@@ -7,7 +7,7 @@ use std::{
 use tokio::sync::broadcast::{channel, Sender};
 
 const SIZE: usize = 1024;
-const CHANNEL_WIDTH: usize = 32;
+const CHANNEL_WIDTH: usize = 128;
 
 #[derive(Clone)]
 pub struct ModelController {
