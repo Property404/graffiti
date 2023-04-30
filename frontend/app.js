@@ -14,7 +14,6 @@ let color = {
     blue: 0
 };
 let radius = 10;
-let shape = "square";
 
 function rgbToHex(r, g, b) {
     function componentToHex(c) {
@@ -33,7 +32,7 @@ function hexToRgb(hex) {
     }
 }
 
-function form_update(x, y, radius, shape) {
+function form_update(x, y, radius) {
     x = Math.floor(x)
     y = Math.floor(y)
     radius = Math.floor(radius)
@@ -41,8 +40,7 @@ function form_update(x, y, radius, shape) {
         x,
         y,
         radius,
-        color,
-        shape
+        color
     }
 }
 
@@ -76,13 +74,8 @@ function apply_update(update) {
         const hex = rgbToHex(update?.color?.red, update?.color?.green, update?.color?.blue);
         ctx.fillStyle = hex;
     }
-    if (update.shape === "square") {
-        ctx.fillRect(x - radius, y - radius, radius * 2, radius * 2)
-    } else if (update.shape === "circle") {
-        ctx.beginPath();
-        ctx.arc(x, y, radius, 0, Math.PI * 2);
-        ctx.fill();
-    }
+
+    ctx.fillRect(x - radius, y - radius, radius * 2, radius * 2)
 }
 
 async function restoreCanvas() {
@@ -110,7 +103,7 @@ async function restoreCanvas() {
 
 function draw_shape(old_x, old_y, mouse_x, mouse_y) {
     const updates = [
-        form_update(mouse_x, mouse_y, radius, shape),
+        form_update(mouse_x, mouse_y, radius),
     ]
 
     const num_steps = 4;
@@ -119,7 +112,7 @@ function draw_shape(old_x, old_y, mouse_x, mouse_y) {
 
     if (old_x !== null) {
         for (let step = 1; step < num_steps; step++) {
-            updates.push(form_update(old_x + delta_x * step, old_y + delta_y * step, radius, shape))
+            updates.push(form_update(old_x + delta_x * step, old_y + delta_y * step, radius))
         }
     }
 
