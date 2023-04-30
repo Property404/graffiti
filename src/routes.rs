@@ -23,7 +23,7 @@ pub fn routes(mc: ModelController) -> Router {
 
 async fn update_state(State(mc): State<ModelController>, Json(update): Json<Update>) -> Result {
     // Skip update if it makes no impact
-    if mc.update_state(update.clone()).await? {
+    if let Some(update) = mc.update_state(update).await? {
         mc.tx.send(update).map_err(|e| Error::Send(e.to_string()))?;
     }
     Ok(())

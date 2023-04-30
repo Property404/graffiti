@@ -26,7 +26,7 @@ impl Default for ModelController {
 }
 
 impl ModelController {
-    pub async fn update_state(&self, update: Update) -> Result<bool> {
+    pub async fn update_state(&self, update: Update) -> Result<Option<Update>> {
         let mut state = self.state.lock().expect("poisoned");
         if state.len() > SIZE * SIZE {
             panic!("Bad length: {}", state.len());
@@ -34,17 +34,39 @@ impl ModelController {
 
         let mut changed = false;
 
-        for (point, color) in update.into_map() {
-            if point.x >= SIZE as u16 || point.y >= SIZE as u16 {
-                continue;
-            }
-            if state.get(&point) != Some(&color) {
-                changed = true;
-                state.insert(point, color);
+        let Update {
+            center,
+            radius,
+            color,
+        } = update;
+
+        let mut effective_r = 0;
+
+        for x in center.x.saturating_sub(radius)..center.x + radius {
+            for y in center.y.saturating_sub(radius)..center.y + radius {
+                let point = Point { x, y };
+                if point.x >= SIZE as u16 || point.y >= SIZE as u16 {
+                    continue;
+                }
+
+                if state.get(&point) != Some(&color) {
+                    effective_r = std::cmp::max(effective_r, point.x.abs_diff(center.x));
+                    effective_r = std::cmp::max(effective_r, point.y.abs_diff(center.y));
+                    changed = true;
+                    state.insert(point, color);
+                }
             }
         }
 
-        Ok(changed)
+        if changed {
+            Ok(Some(Update {
+                center,
+                radius: effective_r,
+                color,
+            }))
+        } else {
+            Ok(None)
+        }
     }
 
     pub async fn get_state(&self) -> Result<Vec<u8>> {

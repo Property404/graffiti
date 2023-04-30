@@ -1,5 +1,4 @@
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
 
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Default)]
 #[serde(default)]
@@ -30,26 +29,9 @@ impl From<Point> for u32 {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct Update {
     #[serde(flatten)]
-    center: Point,
-    radius: u16,
-    color: Color,
-}
-
-impl Update {
-    pub fn into_map(self) -> HashMap<Point, Color> {
-        let Self {
-            center,
-            radius,
-            color,
-        } = self;
-        let mut map = HashMap::new();
-        for x in center.x.saturating_sub(radius)..center.x + radius {
-            for y in center.y.saturating_sub(radius)..center.y + radius {
-                map.insert(Point { x, y }, color);
-            }
-        }
-        map
-    }
+    pub center: Point,
+    pub radius: u16,
+    pub color: Color,
 }
 
 #[cfg(test)]
