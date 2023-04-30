@@ -8,12 +8,8 @@ const canvas_height = 1024;
 canvas.width = canvas_width
 canvas.height = canvas_height
 
-let color = {
-    red: 0,
-    green: 0,
-    blue: 0
-};
-let radius = 10;
+let color = null;
+let radius = null;
 
 function rgbToHex(r, g, b) {
     function componentToHex(c) {
@@ -55,10 +51,25 @@ function send_update(update) {
     })
 }
 
+function restore_settings() {
+    const slider = document.getElementById("radius-slider");
+    const picker = document.getElementById("color-button");
+    const radius = localStorage["radius"];
+    const color = localStorage["color"];
+    if (radius != null) {
+        slider.value = radius;
+    }
+    if (color != null) {
+        picker.value = color;
+    }
+}
+
 function update_brush() {
     const color_value = document.getElementById("color-button").value;
     radius = document.getElementById("radius-slider").value;
     color = hexToRgb(color_value);
+    localStorage["radius"] = radius;
+    localStorage["color"] = color_value;
 }
 
 function apply_update(update) {
@@ -138,6 +149,7 @@ async function main() {
         return;
     }
 
+    restore_settings();
     update_brush();
 
     canvas.addEventListener("mousedown", function(e) {
