@@ -135,8 +135,12 @@ function draw_shape(old_x, old_y, mouse_x, mouse_y) {
 }
 
 function calc_mouse_positions(e) {
-    const mouse_x = canvas_width * (e.offsetX / canvas.clientWidth);
-    const mouse_y = canvas_height * (e.offsetY / canvas.clientHeight);
+    const rect = e.target.getBoundingClientRect()
+    // Support both mouse and touchscreen
+    let mouse_x = e.offsetX ?? (e.changedTouches[0].pageX - rect.left);
+    let mouse_y = e.offsetY ?? (e.changedTouches[0].pageY - rect.top);
+    mouse_x = canvas_width * (mouse_x / canvas.clientWidth);
+    mouse_y = canvas_height * (mouse_y / canvas.clientHeight);
     return [mouse_x, mouse_y];
 }
 
