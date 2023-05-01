@@ -172,9 +172,9 @@ async function main() {
         canvas.onmousemove = draw;
         canvas.ontouchmove = draw;
 
-        canvas.onmouseup = canvas.ontouchend = () => {
+        document.onmouseup = canvas.ontouchend = () => {
             canvas.onmousemove = null;
-            canvas.onmouseup = null;
+            document.onmouseup = null;
             canvas.ontouchmove = null;
             canvas.ontouchend = null;
         }
